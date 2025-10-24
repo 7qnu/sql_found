@@ -4,10 +4,8 @@ from requests.exceptions import RequestException
 import sys
 import time
 
-# Initialize colorama for colored terminal output
 init(autoreset=True)
 
-# Banner
 print(Fore.GREEN + r'''
   _________________  .____      ___________                      .___
  /   _____/\_____  \ |    |     \_   _____/___  __ __  ____    __| _/
@@ -19,7 +17,6 @@ print(Fore.GREEN + r'''
     Github Page : https://github.com/7qnu
 ''')
 
-# Function to detect SQL errors in HTTP response
 def is_vulnerable(response):
     """
     Determines whether a page is SQL Injection vulnerable by checking
@@ -53,7 +50,6 @@ def is_vulnerable(response):
                 return True
     return False
 
-# Function to scan a URL for SQL injection vulnerabilities and detect WAF
 def scan(url):
     """Scan the URL for SQL injection vulnerabilities and detect WAF behavior."""
     payloads = [
@@ -92,7 +88,6 @@ def scan(url):
     vulnerable = False
 
     try:
-        # Fetch baseline response
         baseline_response = requests.get(url, headers=headers, timeout=5)
         baseline_length = len(baseline_response.content)
 
@@ -102,13 +97,11 @@ def scan(url):
                 response = requests.get(full_url, headers=headers, timeout=5)
                 content_length = len(response.content)
 
-                # WAF Detection
                 if response.status_code in [403, 406, 429]:
                     print(Fore.RED + f"[!] WAF Detected: Payload '{payload}' caused HTTP {response.status_code}")
                 elif abs(content_length - baseline_length) > 50:
                     print(Fore.YELLOW + f"[!] WAF behavior detected: Response length changed with payload '{payload}'")
 
-                # Check for SQL Injection
                 if is_vulnerable(response):
                     print(Fore.GREEN + f"[+] SQL Injection Found with payload: {payload}")
                     vulnerable = True
@@ -126,7 +119,6 @@ def scan(url):
     else:
         print(Fore.RED + "[+] The target is NOT vulnerable to SQL Injection.")
 
-# Main program to handle single or multiple URLs
 if __name__ == "__main__":
     try:
         choice = input(Fore.CYAN + "[*] Choose scan type (1 for single URL, 2 for URLs from file): ")
